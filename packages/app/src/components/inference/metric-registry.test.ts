@@ -128,6 +128,28 @@ describe('metric registry', () => {
       expect(group.labelZh).toContain(' TCO ');
     }
   });
+
+  it('keeps the Measured Energy key list in lockstep with the registry', () => {
+    // Every registry key starting `measured` must be in the exported list, so
+    // a new telemetry metric cannot silently miss the tier decorations.
+    const measuredRegistryKeys = Object.keys(METRIC_REGISTRY)
+      .filter((key) => key.startsWith('measured'))
+      .map((key) => `y_${key}`);
+    expect([...MEASURED_ENERGY_METRIC_CONFIG_KEYS].toSorted()).toEqual(
+      measuredRegistryKeys.toSorted(),
+    );
+
+    const measuredGroup = METRIC_CONTROL_GROUPS.find((group) => group.label === 'Measured Energy');
+    expect(measuredGroup?.metrics).toBe(MEASURED_ENERGY_METRIC_CONFIG_KEYS);
+  });
+
+  it('classifies measured-energy config keys', () => {
+    expect(isMeasuredEnergyConfigKey('y_measuredAvgPower')).toBe(true);
+    expect(isMeasuredEnergyConfigKey('y_measuredWhPerSuccessfulQuery')).toBe(true);
+    expect(isMeasuredEnergyConfigKey('y_tpPerGpu')).toBe(false);
+    expect(isMeasuredEnergyConfigKey('y_jTotal')).toBe(false);
+    expect(isMeasuredEnergyConfigKey('y')).toBe(false);
+  });
 });
 
 describe('metric compatibility', () => {
