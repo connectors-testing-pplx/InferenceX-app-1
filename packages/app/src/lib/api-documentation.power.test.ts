@@ -12,7 +12,6 @@ describe('measured-power API documentation', () => {
   it('types every power metric key in the benchmarks metrics schema', () => {
     const metricsSchema = benchmarkRowSchema?.properties?.metrics;
     expect(metricsSchema).toBeDefined();
-    // Non-power keys stay admitted alongside the typed power properties.
     expect(metricsSchema?.additionalProperties).toEqual({ type: 'number' });
     for (const key of POWER_METRIC_KEYS) {
       const property = metricsSchema?.properties?.[key];
@@ -65,7 +64,6 @@ describe('measured-power API documentation', () => {
       enum: ['1', '0', 'any', 'strictV2'],
       default: 'any',
     });
-    // The documented enum comes from the filter module, so route and docs cannot drift.
     expect([...POWER_VALIDITY_FILTERS]).toEqual(['1', '0', 'any', 'strictV2']);
   });
 
