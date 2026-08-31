@@ -5,6 +5,7 @@ import {
   DEFAULT_METRIC_CONFIG_KEY,
   isBenchmarkMetricKey,
   isMeasuredEnergyConfigKey,
+  isRoleLocalMeasuredEnergyConfigKey,
   MEASURED_ENERGY_METRIC_CONFIG_KEYS,
   METRIC_CONFIG_KEYS,
   METRIC_CONTROL_GROUPS,
@@ -75,6 +76,13 @@ describe('metric registry', () => {
 
     const measuredGroup = METRIC_CONTROL_GROUPS.find((group) => group.label === 'Measured Energy');
     expect(measuredGroup?.metrics).toBe(MEASURED_ENERGY_METRIC_CONFIG_KEYS);
+  });
+
+  it('identifies only the role-local prefill and decode energy axes', () => {
+    expect(isRoleLocalMeasuredEnergyConfigKey('y_measuredPrefillJPerInputToken')).toBe(true);
+    expect(isRoleLocalMeasuredEnergyConfigKey('y_measuredDecodeJPerOutputToken')).toBe(true);
+    expect(isRoleLocalMeasuredEnergyConfigKey('y_measuredJPerOutputToken')).toBe(false);
+    expect(isRoleLocalMeasuredEnergyConfigKey('y_measuredPrefillAvgPower')).toBe(false);
   });
 
   it('classifies measured-energy config keys', () => {

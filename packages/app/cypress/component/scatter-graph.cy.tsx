@@ -81,6 +81,37 @@ describe('ScatterGraph', () => {
     cy.contains('No data available').should('be.visible');
   });
 
+  it('explains when the selected dataset lacks role-local energy', () => {
+    mountWithProviders(
+      <div style={{ width: 800, height: 600 }}>
+        <ScatterGraph
+          chartId="test-scatter-role-energy-empty"
+          modelLabel="DeepSeek R1"
+          data={[]}
+          xLabel="Interactivity"
+          yLabel="Measured Prefill J per Input Token"
+          chartDefinition={defaultChartDef}
+        />
+      </div>,
+      {
+        inference: {
+          hardwareConfig: hwConfig,
+          activeHwTypes: new Set(['mi355x']),
+          hwTypesWithData: new Set(),
+          selectedYAxisMetric: 'y_measuredPrefillJPerInputToken',
+        },
+        unofficial: {},
+      },
+    );
+
+    cy.contains('This dataset does not report role-level prefill/decode energy.').should(
+      'be.visible',
+    );
+    cy.contains(
+      'Please change the model, sequence, precision, date range or chip selection.',
+    ).should('not.exist');
+  });
+
   it('localizes the complete Chinese empty state', () => {
     mountWithProviders(
       <PathnameContext.Provider value="/zh/inference">
@@ -107,6 +138,35 @@ describe('ScatterGraph', () => {
     cy.contains('暂无数据').should('be.visible');
     cy.contains('请调整模型、序列长度、精度、日期范围或芯片选项。').should('be.visible');
     cy.contains('No data available').should('not.exist');
+  });
+
+  it('localizes the missing role-energy explanation', () => {
+    mountWithProviders(
+      <PathnameContext.Provider value="/zh/inference">
+        <div style={{ width: 375, height: 600 }}>
+          <ScatterGraph
+            chartId="test-scatter-role-energy-empty-zh"
+            modelLabel="DeepSeek R1"
+            data={[]}
+            xLabel="交互性"
+            yLabel="每输入 token 实测 Prefill 能耗"
+            chartDefinition={defaultChartDef}
+          />
+        </div>
+      </PathnameContext.Provider>,
+      {
+        inference: {
+          hardwareConfig: hwConfig,
+          activeHwTypes: new Set(['mi355x']),
+          hwTypesWithData: new Set(),
+          selectedYAxisMetric: 'y_measuredPrefillJPerInputToken',
+        },
+        unofficial: {},
+      },
+    );
+
+    cy.contains('当前数据集未提供 Prefill/Decode 各角色的能耗数据。').should('be.visible');
+    cy.contains('请调整模型、序列长度、精度、日期范围或芯片选项。').should('not.exist');
   });
 
   it('renders scatter points as shapes in SVG with mock data', () => {
