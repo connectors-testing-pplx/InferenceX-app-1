@@ -727,9 +727,6 @@ describe('generateGPUGraphTooltipContent', () => {
   });
 });
 
-// ===========================================================================
-// withheld measured-power line (power_invalid_reasons)
-// ===========================================================================
 describe('measured-power withheld tooltip line', () => {
   const reasons = ['sampling_gap_exceeded', 'expected_gpu_count_mismatch'];
 

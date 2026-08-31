@@ -426,10 +426,6 @@ describe('mapBenchmarkRow', () => {
     });
 
     it('tolerates the invalid-verdict companion fields without scrubbing them', () => {
-      // PLAN-06 producers ship power_invalid_reasons / power_audit alongside
-      // power_valid=0. The scrub must never touch them: they exist to explain
-      // it, riding dedicated BenchmarkParams fields — never the numeric
-      // metrics record.
       const tracker = createSkipTracker();
       const result = mapBenchmarkRow(
         makeV2Row({
@@ -917,10 +913,6 @@ describe('scrubWithheldPowerMetrics (direct — supplemental ingest path)', () =
   });
 
   it('recovers provenance companions nested under metrics and leaves the record flat', () => {
-    // ingest-supplemental.ts also accepts the provenance companions nested in
-    // `metrics` (where power_valid rides in that format), extracting them via
-    // the shared narrowers and deleting the keys so the persisted metrics
-    // jsonb stays a flat numeric record. Pin that sequence.
     const metrics = supplementalMetrics({
       power_valid: 0,
       power_invalid_reasons: ['sampling_gap_exceeded', 'sampling_gap_exceeded', '<img src=x>'],
@@ -1088,7 +1080,6 @@ describe('extractPowerInvalidReasons', () => {
 });
 
 describe('extractPowerAudit', () => {
-  /** Full valid audit as aggregate_power.py emits it on a multinode run. */
   const fullAudit = {
     window_start_unix: 1756174800.25,
     window_end_unix: 1756175400.75,
@@ -1157,8 +1148,6 @@ describe('extractPowerAudit', () => {
   });
 
   it('nulls the explicit-null numeric fields a producer emits without a benchmark window', () => {
-    // aggregate_power.py sets window_* / max_sample_gap_s to null when the
-    // benchmark result was unreadable; those are omitted, not kept as null.
     expect(
       extractPowerAudit({
         window_start_unix: null,
@@ -1247,8 +1236,6 @@ describe('mapBenchmarkRow — power audit provenance', () => {
   });
 
   it("never captures a malformed ['5'] reasons array as a numeric metric", () => {
-    // Number(['5']) === 5 — without the NON_METRIC_KEYS guard the generic
-    // capture loop would mint a bogus power_invalid_reasons numeric metric.
     const tracker = createSkipTracker();
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
