@@ -5,9 +5,11 @@
  * renders model/developer or hardware-vendor logos (`/model` pages, inference
  * chart captions, `/compare` pair cards).
  *
- * `amd.svg` is here because AMD's brand guidelines only permit the standard
- * black logo or the reversed-out white logo — no color variant exists, so the
- * dark-mode invert reproduces the official reversed treatment.
+ * `openai.svg` is here because OpenAI's brand mark is monochrome by design —
+ * no color variant exists, so the dark-mode invert reproduces the official
+ * reversed treatment. (`amd.svg` is the monochrome black AMD lockup, retained
+ * as a fallback; the `/compare` hardware cards use the full-color
+ * `amd-color.svg` mark instead — see `vendor-logos.ts`.)
  */
 export const MONOCHROME_LOGO_FILES: ReadonlySet<string> = new Set(['amd.svg', 'openai.svg']);
 
