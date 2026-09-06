@@ -14,6 +14,18 @@ describe('Chinese (/zh) pages', () => {
       cy.contains('快速对比').should('not.exist');
     });
 
+    it('links to the per-model inference pages within /zh', () => {
+      cy.get('[data-testid="landing-model-links-card"] h2').should(
+        'have.text',
+        '按模型查看基准测试',
+      );
+      cy.get('[data-testid="landing-model-links"] a')
+        .should('have.length.gte', 1)
+        .each(($link) => {
+          expect($link.attr('href')).to.match(/^\/zh\/inference\//u);
+        });
+    });
+
     it('sets hreflang alternates to the English homepage', () => {
       cy.get('link[rel="alternate"][hreflang="en"]').should('exist');
       cy.get('link[rel="alternate"][hreflang="zh-CN"]').should('exist');

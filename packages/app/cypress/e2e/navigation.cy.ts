@@ -99,6 +99,23 @@ describe('First-load navigation', () => {
     cy.location('pathname').should('eq', '/overview');
   });
 
+  it('links to every indexable /inference/<model> page from the landing model row', () => {
+    cy.get('[data-testid="landing-model-links"]').should('exist');
+    // Every active model has a crawlable link to its /inference/<slug> page.
+    cy.get('[data-testid="landing-model-links"] a').should('have.length.gte', 1);
+    cy.get('[data-testid="landing-model-links"] a').each(($link) => {
+      expect($link.attr('href')).to.match(/^\/inference\//u);
+    });
+  });
+
+  it('navigates to a per-model inference page from the landing model row', () => {
+    cy.get('[data-testid="landing-model-links"] a').first().then(($link) => {
+      const href = $link.attr('href') as string;
+      cy.wrap($link).click();
+      cy.location('pathname').should('eq', href);
+    });
+  });
+
   it('navigates to dashboard from the header with one click', () => {
     cy.get('[data-testid="nav-link-dashboard"]').click();
     cy.location('pathname').should('eq', '/inference');

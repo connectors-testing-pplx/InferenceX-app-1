@@ -10,10 +10,14 @@ import { Reveal } from '@/components/motion/reveal';
 import { NudgeEngine } from '@/components/nudge-engine';
 import { FAVORITE_PRESETS } from '@/components/favorites/favorite-presets';
 import { GITHUB_OWNER, GITHUB_REPO } from '@semianalysisai/inferencex-constants';
+import { ACTIVE_INFERENCE_MODEL_SLUGS } from '@/lib/inference-model-slug';
 import type { Locale } from '@/lib/i18n';
 
 const STRINGS = {
   en: {
+    browseByModelTitle: 'Browse benchmarks by model',
+    browseByModelLead:
+      'Each model has its own indexable page with model-specific benchmarks and metadata. Jump straight to one:',
     reproTitle: 'Every Result Is Transparently done through Public GitHub Actions Automation',
     reproP1:
       'Every data point on the dashboard is produced by a public GitHub Actions workflow run. The recipe lives in the repo, the run executes on the actual target hardware, and the full logs and artifacts are publicly viewable. Click any point on a chart to jump straight to the run that produced it. All reproducible, auditable, and open source.',
@@ -37,6 +41,8 @@ const STRINGS = {
       'Jump straight into the most popular chip inference benchmark comparisons, curated and ready to explore.',
   },
   zh: {
+    browseByModelTitle: '按模型查看基准测试',
+    browseByModelLead: '每个模型都有独立的可索引页面，包含按模型定制的基准测试与元数据。直接进入：',
     reproTitle: '所有结果均通过公开的 GitHub Actions 流程生成',
     reproP1:
       '仪表板上的每个数据点都来自一次公开的 GitHub Actions 运行。测试配置保存在仓库中，并在对应的真实硬件上执行；完整日志和产物均可公开查看。点击图表中的任意数据点，即可打开生成该结果的运行记录。整个过程可复现、可审计，并完全开源。',
@@ -88,6 +94,40 @@ export function LandingPage({ locale = 'en' }: { locale?: Locale } = {}) {
 
         {/* Split: exploration entry points vs presets */}
         <section className="flex flex-col gap-4 pb-8">
+          {/* Per-model entry points — crawlable links to the indexable
+              /inference/<model> pages. Only actively benchmarked models are
+              promoted here; deprecated model pages stay reachable via the
+              sitemap and dashboard selector. The /inference?g_model=<model>
+              query form keeps working, but these path-form pages give every
+              model a stable, individually indexable URL. */}
+          <Reveal>
+            <Card data-testid="landing-model-links-card">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="size-5 shrink-0 text-brand" />
+                <h2 className="text-lg font-semibold">{t.browseByModelTitle}</h2>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">{t.browseByModelLead}</p>
+              <div className="flex flex-wrap gap-2" data-testid="landing-model-links">
+                {ACTIVE_INFERENCE_MODEL_SLUGS.map((entry) => (
+                  <LandingTrackedLink
+                    key={entry.slug}
+                    href={`${prefix}/inference/${entry.slug}`}
+                    data-testid={`landing-model-link-${entry.slug}`}
+                    analyticsEvent="landing_model_page_clicked"
+                    appNavigation
+                    className="group motion-press inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-accent transition-colors"
+                  >
+                    {entry.seoName}
+                    <ArrowRight
+                      aria-hidden="true"
+                      className="size-3.5 motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:translate-x-0.5"
+                    />
+                  </LandingTrackedLink>
+                ))}
+              </div>
+            </Card>
+          </Reveal>
+
           {/* Reproducibility callout */}
           <Reveal>
             <Card>
